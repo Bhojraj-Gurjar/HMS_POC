@@ -1,0 +1,110 @@
+@use '@angular/material' as mat;
+@import 'styles/page-layout';
+
+@include mat.core();
+
+$hms-primary: mat.m2-define-palette(mat.$m2-indigo-palette, 600);
+$hms-accent: mat.m2-define-palette(mat.$m2-teal-palette, A200);
+$hms-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$hms-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $hms-primary,
+      accent: $hms-accent,
+      warn: $hms-warn,
+    ),
+    typography: mat.m2-define-typography-config(),
+    density: 0,
+  )
+);
+
+@include mat.all-component-themes($hms-theme);
+
+:root {
+  --app-header-height: 64px;
+  --app-sidenav-width: 260px;
+  --app-content-max-width: 1400px;
+  --app-spacing: 16px;
+  --app-radius: 12px;
+  --app-surface: #f9fafb;
+  --hms-blue: #3b82f6;
+  --hms-cyan: #06b6d4;
+  --hms-text-muted: #717182;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--app-surface);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-page {
+  max-width: var(--app-content-max-width);
+  margin: 0 auto;
+  padding: var(--app-spacing);
+}
+
+.page-shell {
+  @extend .hms-page;
+}
+
+.app-card {
+  margin-bottom: var(--app-spacing);
+}
+
+.form-grid {
+  display: grid;
+  gap: var(--app-spacing);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.full-width {
+  width: 100%;
+}
+
+.text-muted {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --app-sidenav-width: 100%;
+  }
+}
+
+.snackbar-success {
+  --mdc-snackbar-container-color: #2e7d32;
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.snackbar-error {
+  --mdc-snackbar-container-color: #c62828;
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.snackbar-info {
+  --mdc-snackbar-container-color: #1565c0;
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.snackbar-warning {
+  --mdc-snackbar-container-color: #ef6c00;
+  --mdc-snackbar-supporting-text-color: #fff;
+}

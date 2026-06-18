@@ -1,0 +1,106 @@
+<div class="patients-page">
+  <header class="page-header">
+    <div class="page-header__icon">
+      <mat-icon>groups</mat-icon>
+    </div>
+    <div>
+      <h1>Patients List</h1>
+      <p>View and manage all registered patients</p>
+    </div>
+  </header>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search Patients</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [formControl]="searchControl" placeholder="Search by name, ID, or contact..." />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select [formControl]="statusFilter">
+            <mat-option value="all">All Status</mat-option>
+            <mat-option value="Active">Active</mat-option>
+            <mat-option value="Discharged">Discharged</mat-option>
+            <mat-option value="Critical">Critical</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-stroked-button type="button">
+          <mat-icon>download</mat-icon>
+          Export
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+    <mat-card-header class="table-card__header">
+      <mat-card-title>
+        {{ filteredPatients().length }} Patient{{ filteredPatients().length === 1 ? '' : 's' }} Found
+      </mat-card-title>
+      <div class="filtered-label">
+        <mat-icon>filter_list</mat-icon>
+        <span>Filtered Results</span>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-wrap">
+        <table mat-table [dataSource]="filteredPatients()" class="patients-table">
+          <ng-container matColumnDef="patientNumber">
+            <th mat-header-cell *matHeaderCellDef>Patient ID</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.patientNumber }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let patient">
+              <div class="name-cell">
+                <div class="name-avatar">{{ getInitials(patient.fullName) }}</div>
+                {{ patient.fullName }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="dateOfBirth">
+            <th mat-header-cell *matHeaderCellDef>DOB</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.dateOfBirth | date: 'mediumDate' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef>Gender</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.gender }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let patient">
+              <mat-chip [class]="statusClass(patient.status)">{{ patient.status }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-col">Actions</th>
+            <td mat-cell *matCellDef="let patient" class="actions-col">
+              <button mat-icon-button (click)="viewPatient(patient)" aria-label="View patient">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editPatient(patient.id)" aria-label="Edit patient">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        @if (filteredPatients().length === 0) {
+          <p class="empty-text">No patients found matching your criteria</p>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

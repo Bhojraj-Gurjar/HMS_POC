@@ -1,0 +1,146 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>Dashboard Overview</h1>
+    <p>Welcome back! Here's what's happening today.</p>
+  </header>
+
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.title) {
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-card__inner">
+            <div class="stat-card__body">
+              <p class="stat-card__label">{{ stat.title }}</p>
+              <h3 class="stat-card__value">{{ stat.value }}</h3>
+              <div class="stat-card__trend" [class.trend-down]="stat.trend === 'down'">
+                <mat-icon>{{ stat.trend === 'up' ? 'trending_up' : 'trending_down' }}</mat-icon>
+                <span>{{ stat.change }}</span>
+                <span class="trend-muted">vs last month</span>
+              </div>
+            </div>
+            <div class="stat-card__icon" [ngClass]="stat.colorClass">
+              <mat-icon>{{ stat.icon }}</mat-icon>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <div class="charts-row">
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Weekly Activity</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="bar-chart">
+          @for (day of weeklyData(); track day.day) {
+            <div class="bar-group">
+              <div class="bars">
+                <div
+                  class="bar bar-patients"
+                  [style.height.%]="(day.patients / maxWeeklyValue()) * 100"
+                  [attr.title]="'Patients: ' + day.patients"
+                ></div>
+                <div
+                  class="bar bar-appointments"
+                  [style.height.%]="(day.appointments / maxWeeklyValue()) * 100"
+                  [attr.title]="'Appointments: ' + day.appointments"
+                ></div>
+              </div>
+              <span class="bar-label">{{ day.day }}</span>
+            </div>
+          }
+        </div>
+        <div class="chart-legend">
+          <span><i class="legend-dot legend-patients"></i> Patients</span>
+          <span><i class="legend-dot legend-appointments"></i> Appointments</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Department Distribution</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="dept-chart">
+          @for (dept of departmentData(); track dept.name) {
+            <div class="dept-row">
+              <div class="dept-label">
+                <span class="dept-dot" [style.background]="dept.color"></span>
+                {{ dept.name }}
+              </div>
+              <div class="dept-bar-track">
+                <div
+                  class="dept-bar-fill"
+                  [style.width.%]="dept.value"
+                  [style.background]="dept.color"
+                ></div>
+              </div>
+              <span class="dept-value">{{ dept.value }}%</span>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="tables-row">
+    <mat-card>
+      <mat-card-header class="card-header-row">
+        <mat-card-title>Recent Patients</mat-card-title>
+        <a mat-button routerLink="/patients" class="view-all-btn">
+          View All
+          <mat-icon>open_in_new</mat-icon>
+        </a>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="patient-list">
+          @for (patient of recentPatients(); track patient.id) {
+            <a class="patient-row" [routerLink]="['/patients', patient.id]">
+              <div class="patient-row__left">
+                <div class="patient-avatar">{{ getInitials(patient.fullName) }}</div>
+                <div>
+                  <p class="patient-name">{{ patient.fullName }}</p>
+                  <p class="patient-meta">{{ patient.patientNumber }}</p>
+                </div>
+              </div>
+              <mat-chip [class]="statusClass(patient.status)">{{ patient.status }}</mat-chip>
+            </a>
+          } @empty {
+            <p class="empty-text">No patients registered yet.</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header class="card-header-row">
+        <mat-card-title>Upcoming Appointments</mat-card-title>
+        <a mat-button routerLink="/appointments" class="view-all-btn">
+          View All
+          <mat-icon>open_in_new</mat-icon>
+        </a>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="appointment-list">
+          @for (apt of upcomingAppointments(); track apt.patientName + apt.time) {
+            <div class="appointment-row">
+              <div>
+                <p class="patient-name">{{ apt.patientName }}</p>
+                <p class="patient-meta">{{ apt.doctorName }}</p>
+                <p class="patient-meta">{{ apt.department }}</p>
+              </div>
+              <div class="appointment-row__right">
+                <p class="apt-time">{{ apt.time }}</p>
+                <p class="patient-meta">{{ apt.date }}</p>
+                <mat-chip class="status-default">{{ apt.type }}</mat-chip>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

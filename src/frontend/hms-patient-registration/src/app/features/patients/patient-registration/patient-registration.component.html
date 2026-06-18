@@ -1,0 +1,109 @@
+<div class="register-page">
+  <header class="page-header">
+    <div class="page-header__icon page-header__icon--green">
+      <mat-icon>person_add</mat-icon>
+    </div>
+    <div>
+      <h1>Register New Patient</h1>
+      <p>Add a new patient to the hospital management system</p>
+    </div>
+  </header>
+
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>Patient Information</mat-card-title>
+      <mat-card-subtitle>Please fill in all the required details</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="register-form">
+        <section>
+          <h3>Personal Details</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>First Name *</mat-label>
+              <input matInput formControlName="firstName" placeholder="Enter first name" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Last Name *</mat-label>
+              <input matInput formControlName="lastName" placeholder="Enter last name" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date of Birth *</mat-label>
+              <input matInput type="date" formControlName="dateOfBirth" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Gender *</mat-label>
+              <mat-select formControlName="gender">
+                @for (gender of genders; track gender) {
+                  <mat-option [value]="gender">{{ gender }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Blood Group</mat-label>
+              <mat-select formControlName="bloodGroup">
+                @for (group of bloodGroups; track group) {
+                  <mat-option [value]="group">{{ group }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </section>
+
+        <section>
+          <h3>Contact Information</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Phone Number *</mat-label>
+              <input matInput formControlName="phone" placeholder="10-digit mobile number" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email Address</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="patient@email.com" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Emergency Contact Name</mat-label>
+              <input matInput formControlName="emergencyName" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Emergency Contact Phone</mat-label>
+              <input matInput formControlName="emergencyContact" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-span">
+              <mat-label>Address</mat-label>
+              <textarea matInput formControlName="address" rows="3" placeholder="Enter complete address"></textarea>
+            </mat-form-field>
+          </div>
+        </section>
+
+        <section>
+          <h3>Additional Notes</h3>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="2"></textarea>
+          </mat-form-field>
+        </section>
+
+        <div class="form-actions">
+          <button mat-flat-button type="submit" class="submit-btn">
+            <mat-icon>save</mat-icon>
+            Register Patient
+          </button>
+          <button mat-stroked-button type="button" (click)="reset()">
+            <mat-icon>close</mat-icon>
+            Reset Form
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

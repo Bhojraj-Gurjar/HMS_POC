@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["@angular-eslint/types"]
+  },
+  "include": ["src/**/*.ts"]
+}
