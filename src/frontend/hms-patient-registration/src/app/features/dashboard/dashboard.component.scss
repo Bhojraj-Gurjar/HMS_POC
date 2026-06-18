@@ -6,9 +6,9 @@
 .stats-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 
-  @media (max-width: 1200px) {
+  @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -156,6 +156,10 @@
   }
 }
 
+.tables-row {
+  grid-template-columns: 1fr;
+}
+
 .chart-card,
 .tables-row mat-card {
   border-radius: 12px;
@@ -217,10 +221,6 @@
   background: #3b82f6;
 }
 
-.bar-appointments {
-  background: #06b6d4;
-}
-
 .bar-label {
   margin-top: 8px;
   font-size: 0.75rem;
@@ -250,10 +250,6 @@
 
 .legend-patients {
   background: #3b82f6;
-}
-
-.legend-appointments {
-  background: #06b6d4;
 }
 
 .dept-chart {
@@ -303,15 +299,13 @@
   text-align: right;
 }
 
-.patient-list,
-.appointment-list {
+.patient-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.patient-row,
-.appointment-row {
+.patient-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -326,11 +320,6 @@
 
 .patient-row:hover {
   background: #f9fafb;
-}
-
-.appointment-row--clickable:hover {
-  background: #f5f3ff;
-  border-color: rgba(139, 92, 246, 0.35);
 }
 
 .patient-row__left {
@@ -362,16 +351,6 @@
   margin: 2px 0 0;
   font-size: 0.875rem;
   color: #717182;
-}
-
-.appointment-row__right {
-  text-align: right;
-}
-
-.apt-time {
-  margin: 0;
-  font-size: 0.875rem;
-  font-weight: 500;
 }
 
 .status-active {

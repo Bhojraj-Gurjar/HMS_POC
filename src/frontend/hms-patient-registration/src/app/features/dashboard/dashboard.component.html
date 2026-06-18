@@ -59,11 +59,6 @@
                   [style.height.%]="(day.patients / maxWeeklyValue()) * 100"
                   [attr.title]="'Patients: ' + day.patients"
                 ></div>
-                <div
-                  class="bar bar-appointments"
-                  [style.height.%]="(day.appointments / maxWeeklyValue()) * 100"
-                  [attr.title]="'Appointments: ' + day.appointments"
-                ></div>
               </div>
               <span class="bar-label">{{ day.day }}</span>
             </div>
@@ -71,7 +66,6 @@
         </div>
         <div class="chart-legend">
           <span><i class="legend-dot legend-patients"></i> Patients</span>
-          <span><i class="legend-dot legend-appointments"></i> Appointments</span>
         </div>
       </mat-card-content>
       </mat-card>
@@ -130,34 +124,6 @@
             </a>
           } @empty {
             <p class="empty-text">No patients registered yet.</p>
-          }
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-header class="card-header-row">
-        <mat-card-title>Upcoming Appointments</mat-card-title>
-        <a mat-button routerLink="/appointments" class="view-all-btn">
-          View All
-          <mat-icon>open_in_new</mat-icon>
-        </a>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="appointment-list">
-          @for (apt of upcomingAppointments(); track apt.patientName + apt.time) {
-            <a class="appointment-row appointment-row--clickable" routerLink="/appointments">
-              <div>
-                <p class="patient-name">{{ apt.patientName }}</p>
-                <p class="patient-meta">{{ apt.doctorName }}</p>
-                <p class="patient-meta">{{ apt.department }}</p>
-              </div>
-              <div class="appointment-row__right">
-                <p class="apt-time">{{ apt.time }}</p>
-                <p class="patient-meta">{{ apt.date }}</p>
-                <mat-chip class="status-default">{{ apt.type }}</mat-chip>
-              </div>
-            </a>
           }
         </div>
       </mat-card-content>

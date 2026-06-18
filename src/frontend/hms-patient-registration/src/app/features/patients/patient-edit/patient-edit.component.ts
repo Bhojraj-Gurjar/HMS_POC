@@ -162,13 +162,18 @@ export class PatientEditComponent implements OnInit {
         next: (response) => {
           if (response.success) {
             this.notifications.success('Patient updated successfully');
-            void this.router.navigate(['/patients', this.patientId]);
+            this.navigateBack();
           }
         },
       });
   }
 
   cancel(): void {
-    void this.router.navigate(['/patients', this.patientId]);
+    this.navigateBack();
+  }
+
+  private navigateBack(): void {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/patients';
+    void this.router.navigateByUrl(returnUrl);
   }
 }

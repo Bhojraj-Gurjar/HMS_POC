@@ -26,18 +26,6 @@ export const routes: Routes = [
           import('./features/patients/patients.routes').then((m) => m.PATIENTS_ROUTES),
       },
       {
-        path: 'appointments',
-        loadComponent: () =>
-          import('./features/appointments/appointments.component').then(
-            (m) => m.AppointmentsComponent,
-          ),
-      },
-      {
-        path: 'reports',
-        loadComponent: () =>
-          import('./features/reports/reports.component').then((m) => m.ReportsComponent),
-      },
-      {
         path: 'unauthorized',
         loadComponent: () =>
           import('./features/auth/unauthorized/unauthorized.component').then(

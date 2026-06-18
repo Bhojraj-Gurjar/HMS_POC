@@ -21,7 +21,13 @@ import { PatientDetail } from '../../../core/models/patient.model';
             <h1>{{ p.fullName }}</h1>
             <p>{{ p.patientNumber }}</p>
           </div>
-          <a mat-flat-button [routerLink]="['/patients', p.id, 'edit']">Edit Patient</a>
+          <a
+            mat-flat-button
+            [routerLink]="['/patients', p.id, 'edit']"
+            [queryParams]="{ returnUrl: '/patients/' + p.id }"
+          >
+            Edit Patient
+          </a>
         </header>
 
         <mat-card>

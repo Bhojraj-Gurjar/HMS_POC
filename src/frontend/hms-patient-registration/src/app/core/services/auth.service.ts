@@ -17,7 +17,7 @@ export class AuthService {
   readonly user = this.userSignal.asReadonly();
 
   isAuthenticated(): boolean {
-    return !!this.userSignal()?.token;
+    return !!this.getToken();
   }
 
   login(request: LoginRequest): Observable<ApiResponse<LoginResponse>> {
@@ -41,11 +41,26 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(STORAGE_KEY);
     this.userSignal.set(null);
-    void this.router.navigate(['/login']);
+    void this.router.navigateByUrl('/login', { replaceUrl: true }).then((navigated) => {
+      if (!navigated) {
+        window.location.assign('/login');
+      }
+    });
   }
 
   getToken(): string | null {
-    return this.userSignal()?.token ?? null;
+    const fromSignal = this.userSignal()?.token;
+    if (fromSignal) {
+      return fromSignal;
+    }
+
+    const stored = this.readStoredUser();
+    if (stored?.token) {
+      this.userSignal.set(stored);
+      return stored.token;
+    }
+
+    return null;
   }
 
   getUserInitials(): string {

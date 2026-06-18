@@ -90,7 +90,9 @@ export class PatientListComponent implements OnInit {
   }
 
   editPatient(id: string): void {
-    void this.router.navigate(['/patients', id, 'edit']);
+    void this.router.navigate(['/patients', id, 'edit'], {
+      queryParams: { returnUrl: '/patients' },
+    });
   }
 
   private loadPatients(): void {

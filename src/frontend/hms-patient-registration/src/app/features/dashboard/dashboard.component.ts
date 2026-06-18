@@ -20,15 +20,6 @@ interface StatCard {
   route: string;
 }
 
-interface AppointmentPreview {
-  patientName: string;
-  doctorName: string;
-  department: string;
-  time: string;
-  date: string;
-  type: string;
-}
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -49,10 +40,9 @@ export class DashboardComponent implements OnInit {
   private readonly loading = inject(LoadingService);
 
   readonly stats = signal<StatCard[]>([]);
-  readonly weeklyData = signal<{ day: string; patients: number; appointments: number }[]>([]);
+  readonly weeklyData = signal<{ day: string; patients: number }[]>([]);
   readonly departmentData = signal<{ name: string; value: number; color: string }[]>([]);
   readonly recentPatients = signal<PatientSummary[]>([]);
-  readonly upcomingAppointments = signal<AppointmentPreview[]>([]);
   readonly maxWeeklyValue = signal(1);
 
   private readonly chartColors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'];
@@ -103,15 +93,15 @@ export class DashboardComponent implements OnInit {
       totalPatients: patients.length,
       newAdmissionsThisMonth: newThisMonth,
       activeCases,
-      appointmentsToday: 12,
+      appointmentsToday: 0,
       weeklyActivity: [
-        { day: 'Mon', patients: 45, appointments: 32 },
-        { day: 'Tue', patients: 52, appointments: 38 },
-        { day: 'Wed', patients: 48, appointments: 35 },
-        { day: 'Thu', patients: 61, appointments: 42 },
-        { day: 'Fri', patients: 55, appointments: 40 },
-        { day: 'Sat', patients: 38, appointments: 28 },
-        { day: 'Sun', patients: 28, appointments: 20 },
+        { day: 'Mon', patients: 45, appointments: 0 },
+        { day: 'Tue', patients: 52, appointments: 0 },
+        { day: 'Wed', patients: 48, appointments: 0 },
+        { day: 'Thu', patients: 61, appointments: 0 },
+        { day: 'Fri', patients: 55, appointments: 0 },
+        { day: 'Sat', patients: 38, appointments: 0 },
+        { day: 'Sun', patients: 28, appointments: 0 },
       ],
       departmentDistribution: [
         { name: 'Cardiology', value: 28 },
@@ -160,15 +150,6 @@ export class DashboardComponent implements OnInit {
         route: '/patients/register',
       },
       {
-        title: 'Appointments',
-        value: data.appointmentsToday.toString(),
-        change: '-3.1%',
-        trend: 'down',
-        icon: 'event',
-        colorClass: 'stat-purple',
-        route: '/appointments',
-      },
-      {
         title: 'Active Cases',
         value: data.activeCases.toString(),
         change: '+5.4%',
@@ -179,11 +160,10 @@ export class DashboardComponent implements OnInit {
       },
     ]);
 
-    this.weeklyData.set(data.weeklyActivity);
-    const maxVal = Math.max(
-      ...data.weeklyActivity.flatMap((d) => [d.patients, d.appointments]),
-      1,
+    this.weeklyData.set(
+      data.weeklyActivity.map((day) => ({ day: day.day, patients: day.patients })),
     );
+    const maxVal = Math.max(...data.weeklyActivity.map((d) => d.patients), 1);
     this.maxWeeklyValue.set(maxVal);
 
     this.departmentData.set(
@@ -194,43 +174,5 @@ export class DashboardComponent implements OnInit {
     );
 
     this.recentPatients.set(data.recentPatients);
-    this.upcomingAppointments.set(this.buildMockAppointments());
-  }
-
-  private buildMockAppointments(): AppointmentPreview[] {
-    return [
-      {
-        patientName: 'Sarah Johnson',
-        doctorName: 'Dr. Michael Chen',
-        department: 'Cardiology',
-        time: '09:00 AM',
-        date: 'Today',
-        type: 'Follow-up',
-      },
-      {
-        patientName: 'Robert Williams',
-        doctorName: 'Dr. Emily Davis',
-        department: 'Neurology',
-        time: '10:30 AM',
-        date: 'Today',
-        type: 'Consultation',
-      },
-      {
-        patientName: 'Maria Garcia',
-        doctorName: 'Dr. James Wilson',
-        department: 'Pediatrics',
-        time: '02:00 PM',
-        date: 'Today',
-        type: 'Check-up',
-      },
-      {
-        patientName: 'David Brown',
-        doctorName: 'Dr. Lisa Anderson',
-        department: 'Orthopedics',
-        time: '03:30 PM',
-        date: 'Today',
-        type: 'Surgery Prep',
-      },
-    ];
   }
 }

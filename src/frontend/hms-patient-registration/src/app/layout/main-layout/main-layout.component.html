@@ -33,11 +33,15 @@
       </nav>
 
       <div class="sidenav-footer">
-        <button mat-button class="nav-link">
-          <mat-icon>settings</mat-icon>
-          <span>Settings</span>
-        </button>
-        <button mat-button class="nav-link nav-link--logout" (click)="logout()">
+        <div class="user-profile">
+          <div class="user-avatar">{{ userInitials }}</div>
+          <div class="user-info">
+            <p class="user-name">{{ username }}</p>
+            <p class="user-email">{{ username }}&#64;healthcare.com</p>
+          </div>
+        </div>
+
+        <button type="button" mat-button class="nav-link nav-link--logout" (click)="logout()">
           <mat-icon>logout</mat-icon>
           <span>Logout</span>
         </button>
@@ -46,34 +50,13 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="layout-content">
-    <header class="layout-header">
-      @if (isHandset()) {
+    @if (isHandset()) {
+      <header class="layout-header">
         <button mat-icon-button (click)="toggleSidenav()" aria-label="Open menu">
           <mat-icon>menu</mat-icon>
         </button>
-      }
-
-      <div class="header-actions">
-        <button mat-icon-button class="notification-btn" aria-label="Notifications">
-          <mat-icon
-            matBadge="3"
-            matBadgeColor="warn"
-            matBadgeSize="small"
-            aria-hidden="false"
-          >
-            notifications
-          </mat-icon>
-        </button>
-
-        <div class="user-profile">
-          <div class="user-avatar">{{ userInitials }}</div>
-          <div class="user-info">
-            <p class="user-name">{{ username }}</p>
-            <p class="user-email">{{ username }}&#64;healthcare.com</p>
-          </div>
-        </div>
-      </div>
-    </header>
+      </header>
+    }
 
     <main class="layout-main">
       <router-outlet />
