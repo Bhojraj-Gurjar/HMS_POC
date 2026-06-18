@@ -3,6 +3,8 @@
   <PropertyGroup>
     <RootNamespace>HMS.PatientRegistration.Api</RootNamespace>
     <AssemblyName>HMS.PatientRegistration.Api</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

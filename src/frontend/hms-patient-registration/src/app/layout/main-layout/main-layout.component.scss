@@ -1,10 +1,11 @@
 :host {
   display: block;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .layout-container {
-  min-height: 100vh;
+  height: 100vh;
   background: #f9fafb;
 }
 
@@ -78,12 +79,49 @@
     color: #6b7280;
   }
 
-  &--active {
+  &--active,
+  &--active-overview {
     background: #eff6ff !important;
     color: #2563eb !important;
 
     mat-icon {
       color: #2563eb;
+    }
+  }
+
+  &--active-register {
+    background: #ecfdf5 !important;
+    color: #059669 !important;
+
+    mat-icon {
+      color: #059669;
+    }
+  }
+
+  &--active-patients {
+    background: #e0f2fe !important;
+    color: #0284c7 !important;
+
+    mat-icon {
+      color: #0284c7;
+    }
+  }
+
+  &--active-appointments {
+    background: #f5f3ff !important;
+    color: #7c3aed !important;
+
+    mat-icon {
+      color: #7c3aed;
+    }
+  }
+
+  &--active-reports {
+    background: #fff7ed !important;
+    color: #ea580c !important;
+
+    mat-icon {
+      color: #ea580c;
     }
   }
 
@@ -111,6 +149,9 @@
 .layout-content {
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .layout-header {

@@ -1,34 +1,51 @@
-<div class="dashboard">
-  <header class="dashboard-header">
-    <h1>Dashboard Overview</h1>
-    <p>Welcome back! Here's what's happening today.</p>
-  </header>
+<div class="dashboard hms-page">
+  <section class="hms-hero">
+    <div>
+      <p class="hms-hero__eyebrow">Overview</p>
+      <h1>Dashboard Overview</h1>
+      <p class="hms-hero__subtitle">Welcome back! Here's what's happening today.</p>
+    </div>
+    <div class="hms-hero__actions">
+      <a mat-stroked-button routerLink="/patients/register" class="hms-hero-btn hms-hero-btn--light">
+        <mat-icon>person_add</mat-icon>
+        Register
+      </a>
+      <a mat-stroked-button routerLink="/patients" class="hms-hero-btn hms-hero-btn--light">
+        <mat-icon>groups</mat-icon>
+        Patients
+      </a>
+    </div>
+  </section>
 
   <div class="stats-grid">
     @for (stat of stats(); track stat.title) {
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-card__inner">
-            <div class="stat-card__body">
-              <p class="stat-card__label">{{ stat.title }}</p>
-              <h3 class="stat-card__value">{{ stat.value }}</h3>
-              <div class="stat-card__trend" [class.trend-down]="stat.trend === 'down'">
-                <mat-icon>{{ stat.trend === 'up' ? 'trending_up' : 'trending_down' }}</mat-icon>
-                <span>{{ stat.change }}</span>
-                <span class="trend-muted">vs last month</span>
+      <a class="stat-card-link" [routerLink]="stat.route">
+        <mat-card class="stat-card stat-card--clickable">
+          <mat-card-content>
+            <div class="stat-card__inner">
+              <div class="stat-card__body">
+                <p class="stat-card__label">{{ stat.title }}</p>
+                <h3 class="stat-card__value">{{ stat.value }}</h3>
+                <div class="stat-card__trend" [class.trend-down]="stat.trend === 'down'">
+                  <mat-icon>{{ stat.trend === 'up' ? 'trending_up' : 'trending_down' }}</mat-icon>
+                  <span>{{ stat.change }}</span>
+                  <span class="trend-muted">vs last month</span>
+                </div>
+              </div>
+              <div class="stat-card__icon" [ngClass]="stat.colorClass">
+                <mat-icon>{{ stat.icon }}</mat-icon>
               </div>
             </div>
-            <div class="stat-card__icon" [ngClass]="stat.colorClass">
-              <mat-icon>{{ stat.icon }}</mat-icon>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+            <span class="stat-card__hint">Click to open</span>
+          </mat-card-content>
+        </mat-card>
+      </a>
     }
   </div>
 
   <div class="charts-row">
-    <mat-card class="chart-card">
+    <a class="chart-card-link" routerLink="/patients">
+      <mat-card class="chart-card chart-card--clickable">
       <mat-card-header>
         <mat-card-title>Weekly Activity</mat-card-title>
       </mat-card-header>
@@ -57,9 +74,11 @@
           <span><i class="legend-dot legend-appointments"></i> Appointments</span>
         </div>
       </mat-card-content>
-    </mat-card>
+      </mat-card>
+    </a>
 
-    <mat-card class="chart-card">
+    <a class="chart-card-link" routerLink="/patients">
+      <mat-card class="chart-card chart-card--clickable">
       <mat-card-header>
         <mat-card-title>Department Distribution</mat-card-title>
       </mat-card-header>
@@ -83,7 +102,8 @@
           }
         </div>
       </mat-card-content>
-    </mat-card>
+      </mat-card>
+    </a>
   </div>
 
   <div class="tables-row">
@@ -126,7 +146,7 @@
       <mat-card-content>
         <div class="appointment-list">
           @for (apt of upcomingAppointments(); track apt.patientName + apt.time) {
-            <div class="appointment-row">
+            <a class="appointment-row appointment-row--clickable" routerLink="/appointments">
               <div>
                 <p class="patient-name">{{ apt.patientName }}</p>
                 <p class="patient-meta">{{ apt.doctorName }}</p>
@@ -137,7 +157,7 @@
                 <p class="patient-meta">{{ apt.date }}</p>
                 <mat-chip class="status-default">{{ apt.type }}</mat-chip>
               </div>
-            </div>
+            </a>
           }
         </div>
       </mat-card-content>

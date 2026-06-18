@@ -116,49 +116,22 @@ src/backend/
 ### Frontend (`src/frontend/hms-patient-registration/`)
 
 ```
-src/
-├── app/
-│   ├── core/
-│   │   ├── auth/                  Guards, auth service
-│   │   ├── constants/             API endpoints, storage keys
-│   │   ├── factories/             Empty model factories
-│   │   ├── interceptors/          Auth, error, loading
-│   │   ├── interfaces/            Domain TypeScript interfaces
-│   │   ├── mappers/               DTO ↔ domain mappers
-│   │   └── services/              API, dropdown, notification, validation
-│   │
-│   ├── shared/
-│   │   ├── pipes/                 AppDatePipe, …
-│   │   ├── ui/                    PageHeader, EmptyState, ValidationMessage
-│   │   └── validators/            DOB, phone, …
-│   │
-│   ├── layout/
-│   │   ├── main-layout/
-│   │   ├── header/
-│   │   └── side-nav/
-│   │
-│   ├── features/
-│   │   ├── auth/                  Login, unauthorized
-│   │   ├── dashboard/
-│   │   └── patients/
-│   │       ├── patient-registration/     Main registration feature
-│   │       │   ├── components/           Personal, address, search dialog, …
-│   │       │   ├── services/               Form service
-│   │       │   └── models/               Typed form models
-│   │       ├── patient-list/
-│   │       ├── patient-detail/
-│   │       ├── patient-edit/
-│   │       ├── patient-registration-wizard/  Legacy wizard (not routed)
-│   │       ├── services/                   PatientApiService
-│   │       └── state/                      Signal-based store
-│   │
-│   ├── app.routes.ts
-│   └── app.config.ts
-│
-├── environments/
-├── styles/
-│   └── _page-layout.scss        # Shared hms-* dashboard-style page layout
-└── main.ts
+src/app/
+├── core/
+│   ├── auth/                  Guards (auth, guest)
+│   ├── interceptors/          Auth, correlation ID, error
+│   ├── models/                ApiResponse, patient, auth types
+│   └── services/              PatientService, MasterDataService, AuthService, …
+├── shared/ui/                 Loading overlay
+├── layout/main-layout/        Sidebar + header shell
+└── features/
+    ├── auth/                  Login, unauthorized
+    ├── dashboard/             KPIs, charts, recent patients
+    ├── patients/              List, registration, detail, edit, search dialog
+    ├── appointments/          Placeholder
+    └── reports/               Placeholder
+
+src/styles/_page-layout.scss   # Shared hms-* page layout
 ```
 
 ## Backend Layers
@@ -203,59 +176,42 @@ Reusable presentational components, pipes, and validators with no feature-specif
 
 ### Features
 
-Lazy-loaded functional areas. Patient registration is the primary POC feature:
+Lazy-loaded functional areas:
 
-- **Shell** — `PatientRegistrationComponent` with hero banner, setup strip, quick-actions sidebar, and sticky action bar
-- **Child components** — personal details, address, professional, additional, documents
-- **Form service** — `PatientRegistrationFormService` builds and patches typed `FormGroup`
-- **Search dialog** — reusable `PatientSearchDialogService` + Material dialog
-- **Patient list** — dashboard-style directory with hero, KPI row, search panel, and data table
-- **Dashboard** — welcome hero, stat cards, recent registrations, quick actions
+- **Dashboard** — hero header, clickable KPI cards, charts, recent patients (`PatientService.getDashboardStats()`)
+- **Patient list** — hero header, search/filter table, colored status chips
+- **Patient registration** — single `PatientRegistrationComponent` with reactive form, search dialog, document upload, recent-patients sidebar
+- **Appointments / Reports** — placeholder screens with shared hero layout
 
 ### UI Layout System
 
-All primary screens (dashboard, patient list, registration) use a shared layout defined in `src/styles/_page-layout.scss`:
+Primary screens use `src/styles/_page-layout.scss`:
 
-| Class prefix | Purpose |
-|--------------|---------|
+| Class | Purpose |
+|-------|---------|
 | `hms-page` | Page container (max-width 1400px, vertical gap) |
-| `hms-hero` | Blue gradient header with title and actions |
-| `hms-stats-row` | KPI stat cards (dashboard and patient list) |
+| `hms-hero` | Blue gradient header with eyebrow, title, subtitle, actions |
 | `hms-panels` | Two-column main + sidebar layout |
 | `hms-panel` | Material card panel styling |
 | `hms-quick-actions` | Sidebar action list |
 
-Registration uses a compact **setup strip** (patient type + appointment reference) instead of summary stat cards. Form fields are **single-column** within each section card.
-
 ### Address Cascading Dropdowns
-
-The address form loads hierarchical master data via `DropdownService`:
 
 ```
 Country (e.g. IN)
-  → State?parentCode=IN     (36 states/UTs for India)
-    → City?parentCode=IN-TN (major cities per state)
-      → Area?parentCode=IN-TN-CHE (sample areas for select cities)
+  → GET /masterdata/State?parentCode=IN
+    → GET /masterdata/City?parentCode=IN-TN
+      → GET /masterdata/Area?parentCode=IN-TN-CHE
 ```
 
-`PatientAddressComponent` uses `control.enable()` / `disable()` (not `[disabled]` on `mat-select`) and tracks per-index loading state. Parent changes call `dropdownService.refresh()` to avoid stale cached empty results.
-
-India geography is seeded from `IndiaGeographySeed.cs` (all states/UTs + 200+ cities). Other countries retain representative sample data in `MockSeedData.cs`.
+`MasterDataService` loads items per level; the registration form resets child dropdowns when a parent changes.
 
 ### Data Flow (Registration)
 
 ```
-Action Bar (Search)
-    → PatientSearchDialogService.open()
-    → PatientSearchService (mock or API)
-    → patchFromRegistration() on form
-    → isEditMode = true
-
-Action Bar (Save)
-    → Form validation
-    → Duplicate check (create only)
-    → PatientApiService.create() / update()
-    → NotificationService feedback
+Search dialog → PatientService.getById() → patch form → edit mode
+Save → duplicate check (create) → PatientService.create() / update()
+Documents → stored in notes JSON as registrationMeta.documents (base64 POC)
 ```
 
 ## Data Modes
@@ -323,7 +279,7 @@ Errors are handled by `ExceptionHandlingMiddleware` and mapped to HTTP status co
 
 ## Legacy Adapter Pattern
 
-Legacy MVC-style endpoints are preserved as adapter controllers under `Controllers/Legacy/`:
+Legacy MVC-style endpoints are exposed under `Controllers/Legacy/`:
 
 | Legacy route | Modern equivalent |
 |--------------|-------------------|
@@ -342,7 +298,7 @@ Adapters translate legacy DTOs and delegate to the same application services —
 | Logging | `LoggingBehavior` (MediatR), `RequestLoggingMiddleware` (HTTP), ASP.NET Core logging |
 | CORS | `DefaultCors` policy for `localhost:4200` |
 | Validation | FluentValidation + reactive form validators (frontend) |
-| Error display | `ErrorHandlerService` + Material snackbars (frontend) |
+| Error display | `NotificationService` + Material snackbars (frontend) |
 
 ## Security (POC State)
 

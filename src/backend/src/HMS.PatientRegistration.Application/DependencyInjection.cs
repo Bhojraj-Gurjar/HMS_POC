@@ -24,7 +24,7 @@ public static class DependencyInjection
         services.AddScoped<IPatientRegistrationService, Services.PatientRegistrationService>();
         services.AddScoped<ILegacyPatientRegistrationService, Services.LegacyPatientRegistrationService>();
         services.AddScoped<IDropdownService, Services.DropdownService>();
-        services.AddScoped<DashboardService>();
+        services.AddScoped<Services.DashboardService>();
 
         return services;
     }

@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HMS.PatientRegistration.Api.Controllers;
 
+/// <summary>Placeholder JWT login for POC demos.</summary>
 [AllowAnonymous]
+[Tags("Authentication")]
 public class AuthController : ApiControllerBase
 {
     private readonly IMediator _mediator;

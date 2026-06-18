@@ -22,8 +22,44 @@ public static class ServiceCollectionExtensions
             {
                 Title = "HMS Patient Registration API",
                 Version = "v1",
-                Description = "Hospital Management System - Patient Registration Migration POC"
+                Description =
+                    "Hospital Management System — Patient Registration Migration POC.\n\n" +
+                    "**Base path:** `/api`\n\n" +
+                    "**Response envelope:** All endpoints return `ApiResponse<T>` with `success`, `message`, `data`, `errors`, and `correlationId`.\n\n" +
+                    "### Endpoint groups\n" +
+                    "| Group | Routes |\n" +
+                    "|-------|--------|\n" +
+                    "| Health | `GET /health` |\n" +
+                    "| Auth | `POST /auth/login` |\n" +
+                    "| Dashboard | `GET /dashboard/stats` |\n" +
+                    "| Patients | `GET/POST/PUT/DELETE /patients`, `POST /patients/duplicate-check` |\n" +
+                    "| Patient Registration | `POST/PUT/GET /patient-registration`, `POST /patient-registration/search` |\n" +
+                    "| Master Data | `GET /masterdata/{type}`, `GET /dropdowns/{type}` |\n" +
+                    "| Legacy Adapters | `POST /patientregistration/*`, `POST /CommonDropdown/Fetch` |\n\n" +
+                    "**Swagger UI:** `/swagger` (Development environment)\n\n" +
+                    "**Auth:** JWT Bearer is configured; POC controllers use `[AllowAnonymous]`."
             });
+
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{typeof(ServiceCollectionExtensions).Assembly.GetName().Name}.xml");
+            if (File.Exists(xmlPath))
+            {
+                options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+            }
+
+            options.TagActionsBy(api =>
+            {
+                if (api.GroupName == "legacy")
+                {
+                    return ["Legacy Adapters"];
+                }
+
+                var controller = api.ActionDescriptor.RouteValues.TryGetValue("controller", out var name)
+                    ? name
+                    : "API";
+                return [controller ?? "API"];
+            });
+
+            options.OrderActionsBy(apiDesc => $"{apiDesc.GroupName}_{apiDesc.RelativePath}");
 
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
@@ -90,7 +126,11 @@ public static class ServiceCollectionExtensions
                 };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("Staff", policy => policy.RequireRole("Receptionist", "Admin"));
+        });
     }
 }
 
@@ -108,16 +148,19 @@ public static class WebApplicationExtensions
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "HMS Patient Registration API v1");
+                options.DocumentTitle = "HMS Patient Registration API";
+                options.DisplayRequestDuration();
+                options.EnableTryItOutByDefault();
             });
         }
 
-        app.UseHttpsRedirection();
-        app.UseCors("DefaultCors");
-
         if (!app.Environment.IsDevelopment())
         {
+            app.UseHttpsRedirection();
             app.UseHsts();
         }
+
+        app.UseCors("DefaultCors");
 
         app.UseAuthentication();
         app.UseAuthorization();

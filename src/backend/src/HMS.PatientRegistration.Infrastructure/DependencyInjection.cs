@@ -7,6 +7,7 @@ using HMS.PatientRegistration.Application.Common.Settings;
 using HMS.PatientRegistration.Infrastructure.Persistence.Seed;
 using HMS.PatientRegistration.Infrastructure.Persistence.StoredProcedures;
 
+using HMS.PatientRegistration.Application.Common.Interfaces.Services;
 using HMS.PatientRegistration.Infrastructure.Identity;
 
 using HMS.PatientRegistration.Infrastructure.Persistence;
@@ -48,8 +49,7 @@ public static class DependencyInjection
         services.Configure<DataModeSettings>(configuration.GetSection(DataModeSettings.SectionName));
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
-
-
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddHttpContextAccessor();
 

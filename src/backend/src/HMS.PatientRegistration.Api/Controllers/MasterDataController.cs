@@ -9,6 +9,7 @@ namespace HMS.PatientRegistration.Api.Controllers;
 [Route("api/[controller]")]
 [Route("api/dropdowns")]
 [AllowAnonymous]
+[Tags("Master Data")]
 public class MasterDataController : ApiControllerBase
 {
     private readonly IDropdownService _dropdownService;

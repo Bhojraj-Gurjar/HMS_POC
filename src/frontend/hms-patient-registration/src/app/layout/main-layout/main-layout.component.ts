@@ -12,6 +12,8 @@ interface NavItem {
   path: string;
   icon: string;
   label: string;
+  exact: boolean;
+  activeClass: string;
 }
 
 @Component({
@@ -38,11 +40,11 @@ export class MainLayoutComponent {
   readonly isHandset = signal(false);
 
   readonly menuItems: NavItem[] = [
-    { path: '/dashboard', icon: 'dashboard', label: 'Overview' },
-    { path: '/patients/register', icon: 'person_add', label: 'Register Patient' },
-    { path: '/patients', icon: 'groups', label: 'Patients List' },
-    { path: '/appointments', icon: 'event', label: 'Appointments' },
-    { path: '/reports', icon: 'description', label: 'Reports' },
+    { path: '/dashboard', icon: 'dashboard', label: 'Overview', exact: true, activeClass: 'nav-link--active-overview' },
+    { path: '/patients/register', icon: 'person_add', label: 'Register Patient', exact: true, activeClass: 'nav-link--active-register' },
+    { path: '/patients', icon: 'groups', label: 'Patients List', exact: true, activeClass: 'nav-link--active-patients' },
+    { path: '/appointments', icon: 'event', label: 'Appointments', exact: true, activeClass: 'nav-link--active-appointments' },
+    { path: '/reports', icon: 'description', label: 'Reports', exact: true, activeClass: 'nav-link--active-reports' },
   ];
 
   readonly username = this.auth.user()?.username ?? 'Admin User';

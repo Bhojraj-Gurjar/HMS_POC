@@ -17,6 +17,7 @@ interface StatCard {
   trend: 'up' | 'down';
   icon: string;
   colorClass: string;
+  route: string;
 }
 
 interface AppointmentPreview {
@@ -147,6 +148,7 @@ export class DashboardComponent implements OnInit {
         trend: 'up',
         icon: 'groups',
         colorClass: 'stat-blue',
+        route: '/patients',
       },
       {
         title: 'New Admissions',
@@ -155,6 +157,7 @@ export class DashboardComponent implements OnInit {
         trend: 'up',
         icon: 'person_add',
         colorClass: 'stat-green',
+        route: '/patients/register',
       },
       {
         title: 'Appointments',
@@ -163,6 +166,7 @@ export class DashboardComponent implements OnInit {
         trend: 'down',
         icon: 'event',
         colorClass: 'stat-purple',
+        route: '/appointments',
       },
       {
         title: 'Active Cases',
@@ -171,6 +175,7 @@ export class DashboardComponent implements OnInit {
         trend: 'up',
         icon: 'monitor_heart',
         colorClass: 'stat-orange',
+        route: '/patients',
       },
     ]);
 

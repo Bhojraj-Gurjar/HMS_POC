@@ -1,109 +1,548 @@
-<div class="register-page">
-  <header class="page-header">
-    <div class="page-header__icon page-header__icon--green">
-      <mat-icon>person_add</mat-icon>
-    </div>
+<div class="register-page hms-page">
+  <section class="hms-hero">
     <div>
-      <h1>Register New Patient</h1>
-      <p>Add a new patient to the hospital management system</p>
+      <p class="hms-hero__eyebrow">Patient Registration</p>
+      <h1>{{ isEditMode ? 'Update Patient' : 'Register Patient' }}</h1>
+      <p class="hms-hero__subtitle">
+        Complete demographics, address, professional, insurance, and integration fields.
+      </p>
+      @if (selectedPatientLabel()) {
+        <span class="hms-hero-badge hms-hero-badge--edit">Editing: {{ selectedPatientLabel() }}</span>
+      }
     </div>
-  </header>
+    <div class="hms-hero__actions">
+      <button mat-stroked-button type="button" class="hms-hero-btn hms-hero-btn--light" (click)="newForm()">
+        <mat-icon>add</mat-icon> New
+      </button>
+      <button mat-stroked-button type="button" class="hms-hero-btn hms-hero-btn--light" (click)="openSearchDialog()">
+        <mat-icon>search</mat-icon> Search
+      </button>
+    </div>
+  </section>
 
-  <mat-card class="form-card">
-    <mat-card-header>
-      <mat-card-title>Patient Information</mat-card-title>
-      <mat-card-subtitle>Please fill in all the required details</mat-card-subtitle>
-    </mat-card-header>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="register-layout">
+    <!-- 1–4: Patient type selector -->
+    <mat-card class="section-card setup-card">
+      <mat-card-header>
+        <mat-card-title>Registration Type</mat-card-title>
+        <mat-card-subtitle>Select workflow: new, existing, staff, or newborn</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-button-toggle-group formControlName="patientType" class="type-toggle" aria-label="Patient type">
+          @for (type of patientTypes; track type.value) {
+            <mat-button-toggle [value]="type.value">
+              <mat-icon>{{ type.icon }}</mat-icon>
+              {{ type.label }}
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
 
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit()" class="register-form">
-        <section>
-          <h3>Personal Details</h3>
-          <div class="form-grid">
+        @if (isExistingType) {
+          <div class="existing-banner">
+            <mat-icon>info</mat-icon>
+            <span>Search and load an existing patient to update their record.</span>
+            <button mat-stroked-button type="button" (click)="openSearchDialog()">Open Search</button>
+          </div>
+        }
+
+        @if (isStaffType) {
+          <div class="form-grid type-fields">
             <mat-form-field appearance="outline">
-              <mat-label>First Name *</mat-label>
-              <input matInput formControlName="firstName" placeholder="Enter first name" />
+              <mat-label>Employee ID</mat-label>
+              <input matInput formControlName="employeeId" placeholder="Staff employee number" />
             </mat-form-field>
-
             <mat-form-field appearance="outline">
-              <mat-label>Last Name *</mat-label>
-              <input matInput formControlName="lastName" placeholder="Enter last name" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Date of Birth *</mat-label>
-              <input matInput type="date" formControlName="dateOfBirth" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Gender *</mat-label>
-              <mat-select formControlName="gender">
-                @for (gender of genders; track gender) {
-                  <mat-option [value]="gender">{{ gender }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Blood Group</mat-label>
-              <mat-select formControlName="bloodGroup">
-                @for (group of bloodGroups; track group) {
-                  <mat-option [value]="group">{{ group }}</mat-option>
-                }
-              </mat-select>
+              <mat-label>Department</mat-label>
+              <input matInput formControlName="staffDepartment" placeholder="e.g. Nursing, Admin" />
             </mat-form-field>
           </div>
-        </section>
+        }
 
-        <section>
-          <h3>Contact Information</h3>
-          <div class="form-grid">
+        @if (isNewbornType) {
+          <div class="form-grid type-fields">
             <mat-form-field appearance="outline">
-              <mat-label>Phone Number *</mat-label>
-              <input matInput formControlName="phone" placeholder="10-digit mobile number" />
+              <mat-label>Mother MR Number</mat-label>
+              <input matInput formControlName="motherMrn" placeholder="Mother's MRN" />
             </mat-form-field>
-
             <mat-form-field appearance="outline">
-              <mat-label>Email Address</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="patient@email.com" />
+              <mat-label>Birth Weight (kg)</mat-label>
+              <input matInput formControlName="birthWeight" placeholder="e.g. 3.2" />
             </mat-form-field>
-
             <mat-form-field appearance="outline">
-              <mat-label>Emergency Contact Name</mat-label>
-              <input matInput formControlName="emergencyName" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Emergency Contact Phone</mat-label>
-              <input matInput formControlName="emergencyContact" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-span">
-              <mat-label>Address</mat-label>
-              <textarea matInput formControlName="address" rows="3" placeholder="Enter complete address"></textarea>
+              <mat-label>Birth Time</mat-label>
+              <input matInput type="time" formControlName="birthTime" />
             </mat-form-field>
           </div>
-        </section>
+        }
 
-        <section>
-          <h3>Additional Notes</h3>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Notes</mat-label>
-            <textarea matInput formControlName="notes" rows="2"></textarea>
-          </mat-form-field>
-        </section>
+        <!-- 10: Appointment reference -->
+        <mat-form-field appearance="outline" class="full-width appointment-ref">
+          <mat-label>Appointment Reference</mat-label>
+          <mat-icon matPrefix>event_note</mat-icon>
+          <input matInput formControlName="appointmentReference" placeholder="Integration-ready appointment / visit reference" />
+          <mat-hint>For future appointment module integration</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
 
-        <div class="form-actions">
-          <button mat-flat-button type="submit" class="submit-btn">
-            <mat-icon>save</mat-icon>
-            Register Patient
-          </button>
-          <button mat-stroked-button type="button" (click)="reset()">
-            <mat-icon>close</mat-icon>
-            Reset Form
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+    <div class="hms-panels">
+      <div class="main-column">
+        <!-- 5: Demographics -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Patient Demographics</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="form-stack">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Prefix</mat-label>
+                <mat-select formControlName="prefix">
+                  <mat-option value="">—</mat-option>
+                  @for (item of prefixes(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>First Name *</mat-label>
+                <input matInput formControlName="firstName" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Middle Name</mat-label>
+                <input matInput formControlName="middleName" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Last Name *</mat-label>
+                <input matInput formControlName="lastName" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Date of Birth *</mat-label>
+                <input matInput type="date" formControlName="dateOfBirth" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Age (Years)</mat-label>
+                <input matInput formControlName="ageYears" readonly />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Age (Months)</mat-label>
+                <input matInput formControlName="ageMonths" readonly />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Age (Days)</mat-label>
+                <input matInput formControlName="ageDays" readonly />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Gender *</mat-label>
+                <mat-select formControlName="gender">
+                  @for (item of genders(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Blood Group</mat-label>
+                <mat-select formControlName="bloodGroup">
+                  <mat-option value="">—</mat-option>
+                  @for (item of bloodGroups(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Mobile Country</mat-label>
+                <input matInput formControlName="mobileCountryCode" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Mobile Number *</mat-label>
+                <input matInput formControlName="mobile" placeholder="10-digit number" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Civil ID / National ID</mat-label>
+                <input matInput formControlName="nationalId" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Marital Status</mat-label>
+                <mat-select formControlName="maritalStatus">
+                  <mat-option value="">—</mat-option>
+                  @for (item of maritalStatuses(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Additional Demographics</mat-panel-title>
+                <mat-panel-description>Nationality, race, religion, language, warnings</mat-panel-description>
+              </mat-expansion-panel-header>
+              <div class="form-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Nationality</mat-label>
+                  <mat-select formControlName="nationality">
+                    <mat-option value="">—</mat-option>
+                    @for (item of nationalities(); track item.code) {
+                      <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Race</mat-label>
+                  <mat-select formControlName="race">
+                    <mat-option value="">—</mat-option>
+                    @for (item of races(); track item.code) {
+                      <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Religion</mat-label>
+                  <mat-select formControlName="religion">
+                    <mat-option value="">—</mat-option>
+                    @for (item of religions(); track item.code) {
+                      <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Preferred Language</mat-label>
+                  <mat-select formControlName="language">
+                    <mat-option value="">—</mat-option>
+                    @for (item of languages(); track item.code) {
+                      <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-span">
+                  <mat-label>Medical Warnings / Alerts</mat-label>
+                  <textarea matInput formControlName="medicalWarnings" rows="2"></textarea>
+                </mat-form-field>
+              </div>
+            </mat-expansion-panel>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- 6: Residential address -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Residential Address</mat-card-title>
+            <mat-card-subtitle>Country → State → City → Area cascade</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Address Type</mat-label>
+                <mat-select formControlName="addressType">
+                  <mat-option value="Home">Home</mat-option>
+                  <mat-option value="Work">Work</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-span">
+                <mat-label>Address Line 1</mat-label>
+                <input matInput formControlName="addressLine1" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-span">
+                <mat-label>Address Line 2</mat-label>
+                <input matInput formControlName="addressLine2" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Country</mat-label>
+                <mat-select formControlName="country">
+                  @for (item of countries(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>State</mat-label>
+                <mat-select formControlName="state">
+                  <mat-option value="">—</mat-option>
+                  @for (item of states(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>City</mat-label>
+                <mat-select formControlName="city">
+                  <mat-option value="">—</mat-option>
+                  @for (item of cities(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Area</mat-label>
+                <mat-select formControlName="area">
+                  <mat-option value="">—</mat-option>
+                  @for (item of areas(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Pincode</mat-label>
+                <input matInput formControlName="postalCode" maxlength="6" />
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- 7: Office / professional -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Office / Professional Details</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Occupation</mat-label>
+                <mat-select formControlName="occupation">
+                  <mat-option value="">—</mat-option>
+                  @for (item of occupations(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Company</mat-label>
+                <mat-select formControlName="company">
+                  <mat-option value="">—</mat-option>
+                  @for (item of companies(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Profession</mat-label>
+                <mat-select formControlName="profession">
+                  <mat-option value="">—</mat-option>
+                  @for (item of professions(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Income Category</mat-label>
+                <mat-select formControlName="incomeCategory">
+                  <mat-option value="">—</mat-option>
+                  @for (item of incomeCategories(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-span">
+                <mat-label>Office Address</mat-label>
+                <textarea matInput formControlName="officeAddress" rows="2"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- 8: Insurance / sponsor placeholder -->
+        <mat-card class="section-card placeholder-card">
+          <mat-card-header>
+            <mat-card-title>Insurance / Sponsor</mat-card-title>
+            <mat-card-subtitle>Placeholder — full insurance module coming soon</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Provider / Sponsor</mat-label>
+                <input matInput formControlName="insuranceProvider" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Policy Number</mat-label>
+                <input matInput formControlName="insurancePolicyNumber" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Group Number</mat-label>
+                <input matInput formControlName="insuranceGroupNumber" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Expiry Date</mat-label>
+                <input matInput type="date" formControlName="insuranceExpiry" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-span">
+                <mat-label>Sponsor Name</mat-label>
+                <input matInput formControlName="sponsorName" />
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- 9: Documents -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Documents</mat-card-title>
+            <mat-card-subtitle>Upload ID proof, insurance card, or consent forms</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <input
+              #documentInput
+              type="file"
+              class="document-input-hidden"
+              accept=".pdf,.jpg,.jpeg,.png"
+              multiple
+              (change)="onDocumentsSelected($event)"
+            />
+            <div class="upload-placeholder" (click)="triggerDocumentUpload()">
+              <mat-icon>cloud_upload</mat-icon>
+              <p>Click to upload documents</p>
+              <span>Accepted: PDF, JPG, PNG (max 5MB each)</span>
+            </div>
+
+            @if (documents().length) {
+              <ul class="document-list">
+                @for (doc of documents(); track doc.id) {
+                  <li class="document-item">
+                    <div class="document-item__info">
+                      <mat-icon>{{ doc.mimeType === 'application/pdf' ? 'picture_as_pdf' : 'image' }}</mat-icon>
+                      <div>
+                        <p class="document-item__name">{{ doc.name }}</p>
+                        <p class="document-item__meta">{{ formatFileSize(doc.size) }}</p>
+                      </div>
+                    </div>
+                    <div class="document-item__actions">
+                      <button type="button" mat-icon-button (click)="previewDocument(doc)" title="Preview">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                      <button type="button" mat-icon-button color="warn" (click)="removeDocument(doc.id)" title="Remove">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Document Notes</mat-label>
+              <textarea matInput formControlName="documentNotes" rows="2" placeholder="Optional notes about uploaded documents"></textarea>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Emergency Contact & Notes</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Contact Name</mat-label>
+                <input matInput formControlName="emergencyName" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Relationship</mat-label>
+                <mat-select formControlName="emergencyRelationship">
+                  <mat-option value="">—</mat-option>
+                  @for (item of relationships(); track item.code) {
+                    <mat-option [value]="item.code">{{ item.displayName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Phone</mat-label>
+                <input matInput formControlName="emergencyPhone" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="emergencyEmail" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-span">
+                <mat-label>Registration Notes</mat-label>
+                <textarea matInput formControlName="notes" rows="2"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <aside class="hms-panel-side sticky-actions">
+        <mat-card class="hms-panel recent-patients-card">
+          <mat-card-header class="recent-patients-header">
+            <mat-card-title>Recent Patients</mat-card-title>
+            <a mat-button routerLink="/patients" class="view-all-link">View All</a>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="recent-patient-list">
+              @for (patient of recentPatients(); track patient.id) {
+                <a class="recent-patient-row" [routerLink]="['/patients', patient.id]">
+                  <div class="recent-patient-row__left">
+                    <div class="patient-avatar">{{ getInitials(patient.fullName) }}</div>
+                    <div>
+                      <p class="patient-name">{{ patient.fullName }}</p>
+                      <p class="patient-meta">{{ patient.patientNumber }}</p>
+                    </div>
+                  </div>
+                  <mat-chip [class]="statusClass(patient.status)">{{ patient.status }}</mat-chip>
+                </a>
+              } @empty {
+                <p class="empty-text">No patients registered yet.</p>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="hms-panel">
+          <mat-card-header>
+            <mat-card-title>Quick Actions</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="hms-quick-actions">
+            <button type="button" class="hms-quick-action" (click)="newForm()">
+              <mat-icon>add_circle</mat-icon>
+              <div><strong>New Form</strong><span>Clear and start fresh</span></div>
+              <mat-icon class="hms-quick-action__chevron">chevron_right</mat-icon>
+            </button>
+            <button type="button" class="hms-quick-action" (click)="openSearchDialog()">
+              <mat-icon>manage_search</mat-icon>
+              <div><strong>Search Patient</strong><span>Load existing record</span></div>
+              <mat-icon class="hms-quick-action__chevron">chevron_right</mat-icon>
+            </button>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="hms-info-banner">
+          <mat-icon>info</mat-icon>
+          <div>
+            <strong>Registration modes</strong>
+            <p>New, Existing (search & update), Staff, and Newborn workflows are supported on this screen.</p>
+          </div>
+        </mat-card>
+      </aside>
+    </div>
+
+    <div class="action-bar">
+      <button mat-flat-button type="submit" class="submit-btn">
+        <mat-icon>save</mat-icon>
+        {{ isEditMode ? 'Update Patient' : 'Save Patient' }}
+      </button>
+      <button mat-stroked-button type="button" (click)="reset()">
+        <mat-icon>restart_alt</mat-icon> Reset
+      </button>
+      <button mat-button type="button" (click)="openSearchDialog()">
+        <mat-icon>search</mat-icon> Search
+      </button>
+    </div>
+  </form>
 </div>

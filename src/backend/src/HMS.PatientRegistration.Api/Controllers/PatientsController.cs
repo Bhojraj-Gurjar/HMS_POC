@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HMS.PatientRegistration.Api.Controllers;
 
+/// <summary>Modern REST patient CRUD, search, and duplicate detection.</summary>
 // [Authorize] — enable when real JWT issuance is wired up
 [AllowAnonymous]
+[Tags("Patients")]
 public class PatientsController : ApiControllerBase
 {
     private readonly IPatientRegistrationService _patientRegistrationService;

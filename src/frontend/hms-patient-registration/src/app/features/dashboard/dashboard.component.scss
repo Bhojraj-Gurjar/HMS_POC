@@ -1,21 +1,6 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-}
-
-.dashboard-header {
-  h1 {
-    margin: 0;
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: #111827;
-  }
-
-  p {
-    margin: 4px 0 0;
-    color: #717182;
-  }
 }
 
 .stats-grid {
@@ -36,6 +21,49 @@
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  height: 100%;
+}
+
+.stat-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.stat-card--clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.35);
+  }
+}
+
+.stat-card__hint {
+  display: block;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.chart-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.chart-card--clickable {
+  cursor: pointer;
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .stat-card__inner {
@@ -298,6 +326,11 @@
 
 .patient-row:hover {
   background: #f9fafb;
+}
+
+.appointment-row--clickable:hover {
+  background: #f5f3ff;
+  border-color: rgba(139, 92, 246, 0.35);
 }
 
 .patient-row__left {

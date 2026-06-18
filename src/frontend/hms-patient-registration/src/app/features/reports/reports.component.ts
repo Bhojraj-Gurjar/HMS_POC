@@ -1,47 +1,40 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [MatCardModule, MatIconModule],
+  imports: [RouterLink, MatButtonModule, MatCardModule, MatIconModule],
   template: `
-    <div class="placeholder-page">
-      <div class="placeholder-icon">
-        <mat-icon>description</mat-icon>
-      </div>
-      <h1>Reports</h1>
-      <p>Analytics and reporting module coming soon.</p>
-      <mat-card>
+    <div class="hms-page">
+      <section class="hms-hero">
+        <div>
+          <p class="hms-hero__eyebrow">Analytics</p>
+          <h1>Reports</h1>
+          <p class="hms-hero__subtitle">Generate patient census, admission trends, and departmental reports.</p>
+        </div>
+        <div class="hms-hero__actions">
+          <a mat-stroked-button routerLink="/dashboard" class="hms-hero-btn hms-hero-btn--light">
+            <mat-icon>dashboard</mat-icon>
+            Dashboard
+          </a>
+        </div>
+      </section>
+      <mat-card class="placeholder-card">
         <mat-card-content>
-          <p>Generate patient census, admission trends, and departmental reports from here.</p>
+          <p>Analytics and reporting module coming soon.</p>
         </mat-card-content>
       </mat-card>
     </div>
   `,
   styles: `
-    .placeholder-page {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 640px;
-    }
-
-    .placeholder-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
+    .placeholder-card {
       border-radius: 12px;
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: #fff;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.875rem;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     p {

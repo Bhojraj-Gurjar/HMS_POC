@@ -22,8 +22,8 @@
             mat-button
             class="nav-link"
             [routerLink]="item.path"
-            routerLinkActive="nav-link--active"
-            [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+            [routerLinkActive]="item.activeClass"
+            [routerLinkActiveOptions]="{ exact: item.exact }"
             (click)="closeSidenav()"
           >
             <mat-icon>{{ item.icon }}</mat-icon>
@@ -69,7 +69,7 @@
           <div class="user-avatar">{{ userInitials }}</div>
           <div class="user-info">
             <p class="user-name">{{ username }}</p>
-            <p class="user-email">{{ username }}@healthcare.com</p>
+            <p class="user-email">{{ username }}&#64;healthcare.com</p>
           </div>
         </div>
       </div>

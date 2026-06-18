@@ -7,15 +7,24 @@
 | Project | Purpose |
 |---------|---------|
 | `HMS.PatientRegistration.Domain` | Entities, enums, domain exceptions |
-| `HMS.PatientRegistration.Application` | CQRS (MediatR), DTOs, validators, mappings |
-| `HMS.PatientRegistration.Infrastructure` | EF Core, repositories, mock mode, seed data, DI |
+| `HMS.PatientRegistration.Application` | CQRS, DTOs, validators, application services |
+| `HMS.PatientRegistration.Infrastructure` | EF Core, repositories, mock mode, seed data |
 | `HMS.PatientRegistration.Api` | HTTP API, middleware, Swagger |
 | `tests/HMS.PatientRegistration.Tests` | Unit tests |
 
-## Prerequisites
+## Run
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- SQL Server (only when `DataMode` is `Database`)
+```bash
+cd src/backend
+dotnet restore
+dotnet build
+dotnet run --project src/HMS.PatientRegistration.Api
+```
+
+| URL | Purpose |
+|-----|---------|
+| `https://localhost:7001/swagger` | Swagger UI (Development) |
+| `GET /api/health` | Health + data mode |
 
 ## Configuration
 
@@ -30,33 +39,43 @@
 
 | Mode | Description |
 |------|-------------|
-| `Mock` | In-memory repositories with 5 seeded patients and full dropdown catalog (default) |
-| `SqlServer` or `Database` | EF Core + SQL Server; migrates and seeds the same data on first run |
-| `AllowMockFallback` | Falls back to mock repositories if SQL Server is unreachable at startup |
+| `Mock` | In-memory repositories (default) |
+| `SqlServer` / `Database` | EF Core + SQL Server |
+| `AllowMockFallback` | Falls back to mock if SQL Server is unreachable |
 
-Verify active mode: `GET /api/health` returns `dataMode`, `configuredDataMode`, and `mockFallbackActive`.
+## API Endpoints
 
-### Switch to SQL Server
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Health + data mode |
+| POST | `/api/auth/login` | Login placeholder |
+| GET | `/api/dashboard/stats` | Dashboard KPIs and charts |
+| GET | `/api/patients` | Search patients (`searchTerm`, `pageNumber`, `pageSize`) |
+| GET | `/api/patients/{id}` | Get patient |
+| POST | `/api/patients` | Register patient |
+| PUT | `/api/patients/{id}` | Update patient |
+| DELETE | `/api/patients/{id}` | Soft delete |
+| POST | `/api/patients/duplicate-check` | Duplicate detection |
+| POST | `/api/patient-registration` | Create (kebab-case alias) |
+| PUT | `/api/patient-registration/{id}` | Update |
+| GET | `/api/patient-registration/{id}` | Get by ID |
+| POST | `/api/patient-registration/search` | Field-level search |
+| GET | `/api/masterdata/{type}` | Lookup values (`?parentCode=` for cascade) |
+| GET | `/api/dropdowns/{type}` | Alias of masterdata |
+| POST | `/api/patientregistration/IUD` | Legacy insert/update/delete |
+| POST | `/api/patientregistration/Fetch` | Legacy search |
+| POST | `/api/patientregistration/FetchPatientData` | Legacy get by ID/MRN |
+| POST | `/api/CommonDropdown/Fetch` | Legacy dropdown fetch |
 
-```json
-"DataMode": {
-  "Mode": "SqlServer"
-},
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Database=HMS_PatientRegistration;Trusted_Connection=True;TrustServerCertificate=True;"
-}
+Full contracts: [docs/API_DOCUMENTATION.md](../../docs/API_DOCUMENTATION.md)
+
+## Swagger
+
+Swagger is enabled in **Development** with grouped tags, XML summaries, and Try it out:
+
 ```
-
-## Run
-
-```bash
-cd src/backend
-dotnet restore
-dotnet build
-dotnet run --project src/HMS.PatientRegistration.Api
+https://localhost:7001/swagger
 ```
-
-Swagger: `https://localhost:7001/swagger` (or `http://localhost:5001/swagger`)
 
 ## Tests
 
@@ -65,11 +84,14 @@ cd src/backend
 dotnet test
 ```
 
-## Database Mode
+## SQL Server Setup
 
-1. Set `"DataMode": { "Mode": "SqlServer" }`
-2. Update `ConnectionStrings:DefaultConnection`
-3. Create migration:
+```json
+"DataMode": { "Mode": "SqlServer" },
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=HMS_PatientRegistration;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+```
 
 ```bash
 dotnet ef migrations add InitialCreate \
@@ -80,53 +102,3 @@ dotnet ef database update \
   --project src/HMS.PatientRegistration.Infrastructure \
   --startup-project src/HMS.PatientRegistration.Api
 ```
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health + data mode |
-| POST | `/api/auth/login` | Login placeholder (any credentials) |
-| GET | `/api/patients` | Search patients |
-| GET | `/api/patients/{id}` | Get patient |
-| POST | `/api/patients` | Register patient |
-| PUT | `/api/patients/{id}` | Update patient |
-| DELETE | `/api/patients/{id}` | Soft delete |
-| POST | `/api/patients/duplicate-check` | Duplicate detection |
-| GET | `/api/dropdowns/{type}` | Lookup values (alias of `/api/masterdata/{type}`) |
-| GET | `/api/masterdata/{type}` | Lookup values; use `?parentCode=` for State/City/Area |
-
-### Cascading address example (India)
-
-```http
-GET /api/masterdata/State?parentCode=IN
-GET /api/masterdata/City?parentCode=IN-TN
-GET /api/masterdata/Area?parentCode=IN-TN-CHE
-```
-
-### Mock seed data
-
-When `DataMode` is `Mock` (or on first SQL Server run), the API includes:
-
-**Patients (5):** Jane Doe, John Smith, Aisha Khan, Robert Chen, Emily Brown (`MRN-2026-000001` … `000005`).
-
-**Dropdown types:** `Prefix`, `Gender`, `MaritalStatus`, `BloodGroup`, `Nationality`, `Race`, `Religion`, `Language`, `Country`, `State`, `City`, `Area`, `Occupation`, `Company`, `Profession`, `IncomeCategory`, `Relationship`.
-
-**India geography** (`IndiaGeographySeed.cs`):
-
-- 36 states and union territories under country code `IN`
-- 200+ major cities linked to state codes (e.g. `IN-TN` → Chennai, Coimbatore, …)
-
-Other countries use representative sample states/cities in `MockSeedData.cs`.
-
-`PatientTitle` is accepted as an alias for `Prefix`.
-
-### Middleware
-
-| Middleware | Purpose |
-|------------|---------|
-| `CorrelationIdMiddleware` | Request correlation ID |
-| `ExceptionHandlingMiddleware` | Global error → `ApiResponse` |
-| `RequestLoggingMiddleware` | HTTP request/response logging |
-
-All responses use the `ApiResponse<T>` wrapper.

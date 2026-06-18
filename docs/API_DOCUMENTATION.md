@@ -98,6 +98,43 @@ Placeholder login endpoint for POC demos. **Accepts any username/password** and 
 
 ---
 
+## Dashboard
+
+### GET `/dashboard/stats`
+
+Returns KPI metrics, weekly activity, department distribution, and recent patients for the dashboard screen.
+
+**Response `data`:** `DashboardStatsDto`
+
+```json
+{
+  "totalPatients": 128,
+  "newAdmissionsThisMonth": 24,
+  "activeCases": 86,
+  "appointmentsToday": 12,
+  "weeklyActivity": [
+    { "day": "Mon", "patients": 45, "appointments": 32 }
+  ],
+  "departmentDistribution": [
+    { "name": "Cardiology", "value": 28 }
+  ],
+  "recentPatients": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "patientNumber": "MRN-2026-000001",
+      "fullName": "Jane Doe",
+      "dateOfBirth": "1990-05-15",
+      "gender": "Female",
+      "status": "Active",
+      "primaryPhone": "+1-555-0100",
+      "createdAt": "2026-01-10T08:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
 ## Patients (Modern REST)
 
 ### GET `/patients`
@@ -515,24 +552,44 @@ Content-Type: application/json
 
 ## Swagger
 
-Interactive API documentation is available at:
+Interactive OpenAPI documentation is available in **Development**:
 
-```
-https://localhost:7001/swagger
-```
+| URL | Description |
+|-----|-------------|
+| `https://localhost:7001/swagger` | Swagger UI (Try it out, schemas, grouped tags) |
+| `https://localhost:7001/swagger/v1/swagger.json` | OpenAPI JSON spec |
+| `http://localhost:5001/swagger` | HTTP alternative if HTTPS cert issues |
 
-Use Swagger to explore schemas, try requests, and inspect response models during development.
+**Swagger groups (tags):**
+
+| Tag | Endpoints |
+|-----|-----------|
+| Health | `GET /health` |
+| Authentication | `POST /auth/login` |
+| Dashboard | `GET /dashboard/stats` |
+| Patients | `/patients` CRUD + duplicate-check |
+| Patient Registration | `/patient-registration` routes |
+| Master Data | `/masterdata/{type}`, `/dropdowns/{type}` |
+| Legacy Adapters | `/patientregistration/*`, `/CommonDropdown/Fetch` |
+
+All endpoints return the `ApiResponse<T>` envelope. JWT Bearer auth is documented; POC controllers currently use `[AllowAnonymous]`.
 
 ## Frontend Integration
 
-The Angular app uses `ApiBaseService` to unwrap `ApiResponse<T>`:
+The Angular app calls the API via services in `src/app/core/services/`:
+
+| Service | Usage |
+|---------|--------|
+| `PatientService` | Patient CRUD, search, duplicate check, dashboard stats |
+| `MasterDataService` | Cascading dropdowns (`/masterdata/{type}`) |
+| `AuthService` | Login |
 
 ```typescript
 // environment.ts
 apiUrl: '/api'
 
 // proxy.conf.json (dev)
-"/api" → "https://localhost:7001"
+"/api" → "http://localhost:5001"
 ```
 
-Set `useMockPatientSearch: false` in `environment.ts` to use the live API for patient search (recommended when backend is running). The dropdown service calls `refresh()` on parent changes to avoid stale cascade cache after seed updates.
+Interceptors add `Authorization` and `X-Correlation-Id` headers. Error responses are surfaced via `NotificationService` snackbars.

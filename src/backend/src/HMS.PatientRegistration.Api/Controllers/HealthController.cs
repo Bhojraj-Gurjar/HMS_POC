@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HMS.PatientRegistration.Api.Controllers;
 
+/// <summary>Health check and active data mode (Mock vs SQL Server).</summary>
 [AllowAnonymous]
+[Tags("Health")]
 public class HealthController : ApiControllerBase
 {
     private readonly IRuntimeDataMode _runtimeDataMode;

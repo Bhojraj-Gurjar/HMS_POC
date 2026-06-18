@@ -48,6 +48,12 @@ body {
 body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   background-color: var(--app-surface);
+  overflow-x: hidden;
+}
+
+img,
+table {
+  max-width: 100%;
 }
 
 a {

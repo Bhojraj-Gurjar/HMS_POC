@@ -48,4 +48,17 @@ export class PatientService {
   getDashboardStats(): Observable<ApiResponse<DashboardStats>> {
     return this.http.get<ApiResponse<DashboardStats>>(`${environment.apiUrl}/dashboard/stats`);
   }
+
+  checkDuplicates(body: {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    nationalId?: string | null;
+    phone?: string | null;
+  }): Observable<ApiResponse<{ hasDuplicates: boolean; matches: PatientSummary[] }>> {
+    return this.http.post<ApiResponse<{ hasDuplicates: boolean; matches: PatientSummary[] }>>(
+      `${this.baseUrl}/duplicate-check`,
+      body,
+    );
+  }
 }

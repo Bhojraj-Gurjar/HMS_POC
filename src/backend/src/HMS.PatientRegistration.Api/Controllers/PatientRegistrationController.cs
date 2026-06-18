@@ -9,6 +9,7 @@ namespace HMS.PatientRegistration.Api.Controllers;
 
 [Route("api/patient-registration")]
 [AllowAnonymous]
+[Tags("Patient Registration")]
 public class PatientRegistrationController : ApiControllerBase
 {
     private readonly IPatientRegistrationService _patientRegistrationService;

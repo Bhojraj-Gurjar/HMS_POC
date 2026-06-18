@@ -66,6 +66,7 @@ export interface CreatePatientRequest {
   bloodGroup: string;
   nationalId?: string | null;
   nationality?: string | null;
+  legacyPatientId?: string | null;
   notes?: string | null;
   allowDuplicateOverride?: boolean;
   addresses: {

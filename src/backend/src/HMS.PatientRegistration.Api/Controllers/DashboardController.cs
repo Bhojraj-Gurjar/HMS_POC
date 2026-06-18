@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HMS.PatientRegistration.Api.Controllers;
 
+/// <summary>Dashboard KPIs and charts for the hospital overview screen.</summary>
 [AllowAnonymous]
+[Tags("Dashboard")]
 public class DashboardController : ApiControllerBase
 {
     private readonly DashboardService _dashboardService;
@@ -16,6 +18,7 @@ public class DashboardController : ApiControllerBase
         _dashboardService = dashboardService;
     }
 
+    /// <summary>Returns KPI counts, weekly activity, department distribution, and recent patients.</summary>
     [HttpGet("stats")]
     [ProducesResponseType(typeof(ApiResponse<DashboardStatsDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<DashboardStatsDto>>> GetStats(CancellationToken cancellationToken)

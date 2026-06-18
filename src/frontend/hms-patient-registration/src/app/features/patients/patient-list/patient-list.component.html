@@ -1,13 +1,17 @@
-<div class="patients-page">
-  <header class="page-header">
-    <div class="page-header__icon">
-      <mat-icon>groups</mat-icon>
-    </div>
+<div class="patients-page hms-page">
+  <section class="hms-hero">
     <div>
+      <p class="hms-hero__eyebrow">Patient Management</p>
       <h1>Patients List</h1>
-      <p>View and manage all registered patients</p>
+      <p class="hms-hero__subtitle">View and manage all registered patients</p>
     </div>
-  </header>
+    <div class="hms-hero__actions">
+      <a mat-stroked-button routerLink="/patients/register" class="hms-hero-btn hms-hero-btn--light">
+        <mat-icon>person_add</mat-icon>
+        Register
+      </a>
+    </div>
+  </section>
 
   <mat-card class="filters-card">
     <mat-card-content>

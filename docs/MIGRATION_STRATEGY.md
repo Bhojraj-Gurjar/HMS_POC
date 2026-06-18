@@ -77,11 +77,11 @@ The legacy stack couples UI rendering, business logic, and data access in MVC co
 | Activity | Status |
 |----------|--------|
 | Standalone bootstrap, lazy routes, Material theme | ✅ |
-| Core layer (interceptors, guards, `ApiBaseService`) | ✅ |
-| Layout (header, sidenav, main layout) | ✅ |
+| Core layer (interceptors, guards, HTTP services) | ✅ |
+| Layout (main layout with sidebar navigation) | ✅ |
 | Login and dashboard with hospital-grade UI | ✅ |
-| Dropdown service with API + static fallbacks | ✅ |
-| Notification and error handling services | ✅ |
+| MasterDataService for cascading dropdowns | ✅ |
+| Notification and loading services | ✅ |
 
 **Exit criteria:** App loads, authenticates (placeholder), navigates between routes.
 
@@ -115,7 +115,7 @@ The legacy stack couples UI rendering, business logic, and data access in MVC co
 |----------|--------|
 | EF Core migrations against staging database | 🔲 |
 | Data validation scripts (record counts, field mapping) | 🔲 |
-| Point frontend to SQL Server backend (`useMockPatientSearch: false`) | 🔲 |
+| Point frontend to SQL Server backend | 🔲 |
 | Side-by-side comparison with legacy (same inputs → same outputs) | 🔲 |
 | Performance baseline (search, save latency) | 🔲 |
 
